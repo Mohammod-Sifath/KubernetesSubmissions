@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: todo-app
-          image: dockersifath/todo-app:latest
+          image: dockersifath/todo-app:v2
           ports:
             - containerPort: 4444
           env:
