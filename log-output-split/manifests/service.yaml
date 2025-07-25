@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: log-output-split-svc
+spec:
+  selector:
+    app: log-output-split
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000  # reader container's port

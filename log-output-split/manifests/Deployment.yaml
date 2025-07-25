@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-output-split
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-output-split
+  template:
+    metadata:
+      labels:
+        app: log-output-split
+    spec:
+      volumes:
+        - name: shared-logs
+          emptyDir: {}   # This is the shared volume
+      containers:
+        - name: writer
+          image: dockersifath/log-writer:latest
+          volumeMounts:
+            - name: shared-logs
+              mountPath: /usr/src/app/shared  # Writer will write here
+
+        - name: reader
+          image: dockersifath/log-reader:latest
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: shared-logs
+              mountPath: /usr/src/app/shared  # Reader will read from here
