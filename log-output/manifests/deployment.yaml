@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: log-output
+  name: log-output-deployment
 spec:
   replicas: 1
   selector:
@@ -12,7 +12,16 @@ spec:
       labels:
         app: log-output
     spec:
+      volumes:
+        - name: shared-logs
+          persistentVolumeClaim:
+            claimName: pingpong-pvc
       containers:
-      - name: log-output
-        image: dockersifath/log-output:v2
-        imagePullPolicy: IfNotPresent
+        - name: log-output
+          image: dockersifath/log-output:v3
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: shared-logs
+              mountPath: /usr/src/app/shared
+

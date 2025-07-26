@@ -1,4 +1,5 @@
 const express = require('express');
+const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 
 const app = express();
@@ -13,7 +14,7 @@ setInterval(() => {
     console.log(`${now}: ${id}`);
 }, 5000);
 
-// New /status route
+// /status route (for checking uptime and ID)
 app.get('/status', (req, res) => {
     res.json({
         id: id,
@@ -21,7 +22,17 @@ app.get('/status', (req, res) => {
     });
 });
 
+// ✅ /logs route: reads from the shared log file
+app.get('/logs', (req, res) => {
+    try {
+        const data = fs.readFileSync('/usr/src/app/shared/log.txt', 'utf-8');
+        res.send(`<pre>${data}</pre>`);
+    } catch (err) {
+        res.status(500).send('Error reading log file: ' + err.message);
+    }
+});
+
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Log-output app listening at http://localhost:${PORT}`);
 });
 
