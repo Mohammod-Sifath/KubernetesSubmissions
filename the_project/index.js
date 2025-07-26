@@ -53,6 +53,13 @@ app.get('/', (req, res) => {
       <body>
         <h1>THE PROJECT APP</h1>
         <img src="/image-file" alt="Random Cached Image" />
+        <input type="text" maxlength="140" placeholder="Enter a todo (max 140 chars)" />
+        <button>Send</button>
+        <ul>
+          <li>Buy groceries</li>
+          <li>Learn Kubernetes</li>
+          <li>Push to GitHub</li>
+        </ul>
         <div class="description">DevOps with Kubernetes 2025</div>
       </body>
     </html>
