@@ -14,9 +14,14 @@ spec:
     spec:
       containers:
         - name: todo-app
-          image: dockersifath/todo-app:v2
+          image: dockersifath/todo-app:1.12.6
           ports:
-            - containerPort: 4444
-          env:
-            - name: PORT
-              value: "4444"
+            - containerPort: 3000
+          volumeMounts:
+            - name: todo-storage
+              mountPath: /app/storage
+      volumes:
+        - name: todo-storage
+          persistentVolumeClaim:
+            claimName: todo-app-pvc
+
