@@ -1,4 +1,6 @@
+
 kubectl apply -f backend/manifests
+
 kubectl apply -f frontend/manifests
 
 then, go to http://localhost:30000
