@@ -3,10 +3,11 @@ kind: Service
 metadata:
   name: log-output-svc
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: log-output
   ports:
-    - port: 3000          # The port the service exposes inside the cluster
-      targetPort: 3000    # The port your app listens on
-      protocol: TCP
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30002  # You can now access from browser via localhost:30002
+

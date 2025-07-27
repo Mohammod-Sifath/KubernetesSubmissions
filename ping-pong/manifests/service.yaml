@@ -3,8 +3,11 @@ kind: Service
 metadata:
   name: pingpong-svc
 spec:
+  type: NodePort              # <- Expose outside cluster
   selector:
     app: pingpong
   ports:
-    - port: 3001
-      targetPort: 3001
+    - port: 3001             # Port exposed inside cluster
+      targetPort: 3001       # Port app listens on
+      nodePort: 30001        # Port exposed on your machine (browser can use this)
+

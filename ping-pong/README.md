@@ -19,4 +19,3 @@ log-output service: nodePort: 30002
 You can try accessing in browser:
 http://localhost:30001/pingpong
 http://localhost:30002
-

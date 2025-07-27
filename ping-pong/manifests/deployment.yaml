@@ -12,14 +12,9 @@ spec:
       labels:
         app: pingpong
     spec:
-      volumes:
-        - name: shared-logs
-          persistentVolumeClaim:
-            claimName: pingpong-pvc
       containers:
         - name: pingpong
-          image: dockersifath/pingpong:1.9
-          volumeMounts:
-            - name: shared-logs
-              mountPath: /usr/src/app/shared
+          image: dockersifath/pingpong:2.1.1  # new image tag after rebuild
+          ports:
+            - containerPort: 3001
 

@@ -12,16 +12,9 @@ spec:
       labels:
         app: log-output
     spec:
-      volumes:
-        - name: shared-logs
-          persistentVolumeClaim:
-            claimName: pingpong-pvc
       containers:
         - name: log-output
-          image: dockersifath/log-output:v3
+          image: dockersifath/log-output:2.1
           ports:
             - containerPort: 3000
-          volumeMounts:
-            - name: shared-logs
-              mountPath: /usr/src/app/shared
 

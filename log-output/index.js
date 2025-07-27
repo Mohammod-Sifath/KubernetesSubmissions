@@ -1,38 +1,36 @@
-const express = require('express');
-const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
+const http = require('http');
+const { v4: uuid } = require('uuid');
 
-const app = express();
-const PORT = 3000;
+const instanceId = uuid();
 
-const id = uuidv4();
-const startedAt = new Date().toISOString();
+const logMessage = () => {
+  const options = {
+    hostname: 'pingpong-svc',  // pingpong Service name
+    port: 3001,                // must match pingpong's service port
+    path: '/ping',             // pingpong app should have this endpoint
+    method: 'GET'
+  };
 
-// Log to console every 5 seconds
-setInterval(() => {
-    const now = new Date().toISOString();
-    console.log(`${now}: ${id}`);
-}, 5000);
+  const req = http.request(options, res => {
+    let data = '';
 
-// /status route (for checking uptime and ID)
-app.get('/status', (req, res) => {
-    res.json({
-        id: id,
-        startedAt: startedAt
+    res.on('data', chunk => {
+      data += chunk;
     });
-});
 
-// ✅ /logs route: reads from the shared log file
-app.get('/logs', (req, res) => {
-    try {
-        const data = fs.readFileSync('/usr/src/app/shared/log.txt', 'utf-8');
-        res.send(`<pre>${data}</pre>`);
-    } catch (err) {
-        res.status(500).send('Error reading log file: ' + err.message);
-    }
-});
+    res.on('end', () => {
+      const timestamp = new Date().toISOString();
+      console.log(`${timestamp}: ${instanceId}. Ping / Pongs: ${data}`);
+    });
+  });
 
-app.listen(PORT, () => {
-    console.log(`Log-output app listening at http://localhost:${PORT}`);
-});
+  req.on('error', error => {
+    console.error('Error calling pingpong service:', error);
+  });
+
+  req.end();
+};
+
+// Log every 5 seconds
+setInterval(logMessage, 5000);
 
