@@ -15,7 +15,24 @@ spec:
     spec:
       containers:
         - name: log-output
-          image: dockersifath/log-output:2.1
+          image: dockersifath/log-output:2.5
           ports:
             - containerPort: 3000
+          env:
+            - name: MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: log-config
+                  key: MESSAGE
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config  # Change to your app's expected path
+              readOnly: true
+      volumes:
+        - name: config-volume
+          configMap:
+            name: log-config
+            items:
+              - key: information.txt
+                path: information.txt
 
