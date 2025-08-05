@@ -7,6 +7,8 @@ spec:
     storage: 1Gi
   accessModes:
     - ReadWriteOnce
+  storageClassName: manual           # <- add this line
+  persistentVolumeReclaimPolicy: Retain  # recommended for manual PVs
   hostPath:
     path: /tmp/todo-cache
 

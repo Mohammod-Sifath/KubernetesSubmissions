@@ -3,7 +3,16 @@ kubectl apply -f backend/manifests
 
 kubectl apply -f frontend/manifests
 
-then, go to http://localhost:30000
+then use port forward to connect:
+kubectl port-forward svc/todo-service 3000:3000 -n project
+kubectl port-forward -n project svc/todo-backend-service 30002:3002
 
-If localhost:30000 doesn't work, make sure the cluster allows NodePort 30000.
-You can change the port in the frontend/todo-service.yaml file if needed.
+You can now visit:
+
+Frontend: http://localhost:3000
+
+Backend API: http://localhost:30002
+
+
+n.b. the app has the standerdized nodeport setup, but not accesable via k3d.becasue k3d runs on Docker on the machine.
+

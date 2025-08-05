@@ -68,7 +68,7 @@ app.get('/', (req, res) => {
     <ul id="todoList"></ul>
 
     <script>
-      const backendUrl = 'http://localhost:30002'; // Kubernetes service name
+      const backendUrl =  'http://localhost:3002'; // Kubernetes service name
 
       async function fetchTodos() {
         try {
