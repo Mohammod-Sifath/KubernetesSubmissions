@@ -4,7 +4,8 @@ const axios = require('axios'); // We'll use axios for HTTP requests to backend
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3002';
 
 app.use(express.json());
 app.use(express.static('public')); // If you want to serve static files (optional)
@@ -68,7 +69,7 @@ app.get('/', (req, res) => {
     <ul id="todoList"></ul>
 
     <script>
-      const backendUrl =  'http://localhost:3002'; // Kubernetes service name
+      const backendUrl = "${BACKEND_URL}"; // Kubernetes service name
 
       async function fetchTodos() {
         try {

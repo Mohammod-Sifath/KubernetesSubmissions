@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: the-project-config
+  namespace: project
+data:
+  BACKEND_URL: http://localhost:3002
+  PORT: "3000"
+
