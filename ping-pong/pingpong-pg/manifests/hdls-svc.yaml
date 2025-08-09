@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-svc
+  namespace: exercises
+  labels:
+    app: postgres
+spec:
+  clusterIP: None        # HEADLESS
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      name: postgres
