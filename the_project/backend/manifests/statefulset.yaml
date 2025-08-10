@@ -1,48 +1,48 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: todo-backend
+  name: postgres
   namespace: project
 spec:
+  serviceName: postgres-service
   replicas: 1
   selector:
     matchLabels:
-      app: todo-backend
+      app: postgres
   template:
     metadata:
       labels:
-        app: todo-backend
+        app: postgres
     spec:
       containers:
-        - name: todo-backend
-          image: dockersifath/todo-backend:2.8  # new image with DB code
+        - name: postgres
+          image: postgres:15
           ports:
-            - containerPort: 3002
+            - containerPort: 5432
           env:
-            - name: PORT
-              value: "3002"
-
-            # --- Database connection variables ---
-            - name: POSTGRES_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: postgres-config
-                  key: POSTGRES_HOST
-
             - name: POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
                   name: postgres-config
                   key: POSTGRES_DB
-
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
                   name: postgres-secret
                   key: POSTGRES_USER
-
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: postgres-secret
                   key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi

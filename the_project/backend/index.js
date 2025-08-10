@@ -1,36 +1,66 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import pkg from 'pg';  // import pg client
+const { Pool } = pkg;
 
 const app = express();
 const PORT = process.env.PORT || 3002;
 
-// Middlewares
 app.use(cors());
 app.use(bodyParser.json());
 
-let todos = [];
-
-// GET /todos
-app.get('/todos', (req, res) => {
-  res.json(todos);
+// Create PostgreSQL connection pool using env variables
+const pool = new Pool({
+  host: process.env.POSTGRES_HOST,
+  database: process.env.POSTGRES_DB,
+  user: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  port: 5432,  // default Postgres port
 });
 
-// POST /todos
-app.post('/todos', (req, res) => {
-  const { text } = req.body;
+// Helper function to initialize todos table if not exists
+async function initDB() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS todos (
+      id SERIAL PRIMARY KEY,
+      text VARCHAR(140) NOT NULL
+    )
+  `);
+}
 
+initDB().catch(err => {
+  console.error('Error initializing DB:', err);
+  process.exit(1);
+});
+
+// GET /todos - fetch all todos from DB
+app.get('/todos', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM todos ORDER BY id ASC');
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching todos:', err);
+    res.status(500).json({ error: 'Failed to fetch todos' });
+  }
+});
+
+// POST /todos - add new todo to DB
+app.post('/todos', async (req, res) => {
+  const { text } = req.body;
   if (!text || text.length > 140) {
     return res.status(400).json({ error: 'Todo must be between 1 and 140 characters' });
   }
-
-  const newTodo = {
-    id: todos.length + 1,
-    text,
-  };
-
-  todos.push(newTodo);
-  res.status(201).json(newTodo);
+  try {
+    const result = await pool.query(
+      'INSERT INTO todos(text) VALUES($1) RETURNING *',
+      [text]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error('Error adding todo:', err);
+    res.status(500).json({ error: 'Failed to add todo' });
+  }
 });
 
 app.listen(PORT, () => {
