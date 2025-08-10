@@ -1,11 +1,10 @@
 
-#configmap was created and hardcoded part(ports and backendURL was moved to configmap)
 
+```kubectl apply -f backend/manifests```
 
-kubectl apply -f backend/manifests
+```kubectl apply -f frontend/manifests```
 
-kubectl apply -f frontend/manifests
-
+```kubectl apply -f cron/cronjob.yaml```
 
 then use port forward to connect:
 
@@ -21,5 +20,9 @@ Frontend: ```http://localhost:3000```
 Backend API: ```http://localhost:3002```
 
 
-n.b. the app has the standerdized nodeport setup, but not accesable via k3d.becasue k3d runs on Docker on the machine.
+then create a manualjob to see the URL on the Browser:
+
+```kubectl create job manual-test-job --from=cronjob/todo-cronjob -n project```
+
+REFRESH Frontend AGAIN!!!!!
 
