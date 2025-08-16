@@ -1,7 +1,8 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import pkg from 'pg';  // import pg client
+import morgan from 'morgan'; // <-- ADD THIS
+import pkg from 'pg';
 const { Pool } = pkg;
 
 const app = express();
@@ -10,16 +11,18 @@ const PORT = process.env.PORT || 3002;
 app.use(cors());
 app.use(bodyParser.json());
 
-// Create PostgreSQL connection pool using env variables
+// Use morgan to log every request
+app.use(morgan('combined')); // <-- ADD THIS
+
 const pool = new Pool({
   host: process.env.POSTGRES_HOST,
   database: process.env.POSTGRES_DB,
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
-  port: 5432,  // default Postgres port
+  port: 5432,
 });
 
-// Helper function to initialize todos table if not exists
+// DB init
 async function initDB() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS todos (
@@ -28,13 +31,12 @@ async function initDB() {
     )
   `);
 }
-
 initDB().catch(err => {
   console.error('Error initializing DB:', err);
   process.exit(1);
 });
 
-// GET /todos - fetch all todos from DB
+// Routes
 app.get('/todos', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM todos ORDER BY id ASC');
@@ -45,10 +47,10 @@ app.get('/todos', async (req, res) => {
   }
 });
 
-// POST /todos - add new todo to DB
 app.post('/todos', async (req, res) => {
   const { text } = req.body;
   if (!text || text.length > 140) {
+    console.warn(`❌ Rejected todo: "${text}"`); // <-- log rejected todos
     return res.status(400).json({ error: 'Todo must be between 1 and 140 characters' });
   }
   try {
@@ -56,6 +58,7 @@ app.post('/todos', async (req, res) => {
       'INSERT INTO todos(text) VALUES($1) RETURNING *',
       [text]
     );
+    console.log(`✅ Added todo: "${text}"`); // <-- log successful todos
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error('Error adding todo:', err);
@@ -66,4 +69,3 @@ app.post('/todos', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`✅ todo-backend listening on port ${PORT}`);
 });
-

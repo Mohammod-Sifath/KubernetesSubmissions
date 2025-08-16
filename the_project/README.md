@@ -1,3 +1,9 @@
+Img to check monitoring worked perfectly:
+
+[![Grafana Logs](Graffana.png)](Graffana.png)
+
+
+Instructions:
 
 
 ```kubectl apply -f backend/manifests```
@@ -20,9 +26,21 @@ Frontend: ```http://localhost:3000```
 Backend API: ```http://localhost:3002```
 
 
-then create a manualjob to see the URL on the Browser:
 
-```kubectl create job manual-test-job --from=cronjob/todo-cronjob -n project```
+then Install monitoring stack if not available(loki,promtail,graffana)
 
-REFRESH Frontend AGAIN!!!!!
+```
+helm repo add grafana https://grafana.github.io/helm-charts
+helm install loki grafana/loki-stack -n loki-stack --create-namespace
+helm install kube-prometheus grafana/kube-prometheus-stack -n prometheus --create-namespace
+```
+Access Graffana:
 
+```kubectl port-forward -n prometheus svc/kube-prometheus-stack-1755006958-grafana 3100:80```
+
+visit:```http://localhost:3100```
+
+Go to Grafana → Explore → Select Loki datasource(create manually if
+ needed URL:`http://loki.loki-stack:3100`)
+
+select `{namespace="project"}` and Run  Query
