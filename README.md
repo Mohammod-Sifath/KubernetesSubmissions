@@ -1,11 +1,6 @@
 # KubernetesSubmissions
 
 ## Exercises
-### chapter 2
-
-# KubernetesSubmissions
-
-## Exercises
 
 ### Chapter 2
 
