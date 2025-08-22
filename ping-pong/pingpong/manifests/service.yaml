@@ -4,11 +4,10 @@ metadata:
   name: pingpong-svc
   namespace: exercises
 spec:
-  type: NodePort              # <- Expose outside cluster
+  type: LoadBalancer        # GKE will allocate external IP
   selector:
     app: pingpong
   ports:
-    - port: 3001             # Port exposed inside cluster
-      targetPort: 3001       # Port app listens on
-      nodePort: 30001        # Port exposed on your machine (browser can use this)
+    - port: 3001
+      targetPort: 3001
 

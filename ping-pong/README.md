@@ -1,7 +1,11 @@
-1.go to both folders and command
 
-```kubectl apply -f manifests```
+[![Pingpong GKE](3.1.png)](3.1.png)
 
-2.then use port forward to test"
+1. go to both folders and command
 
-```kubectl port-forward service/pingpong-svc 3001:3001 -n exercises```
+```kubectl apply -f manifests -n exercises```
+
+2. then Get the external IP of the LoadBalancer service:
+```kubectl get svc -n exercises```
+
+3. visit:```http://<EXTERNAL-IP>:3001/pingpong```
