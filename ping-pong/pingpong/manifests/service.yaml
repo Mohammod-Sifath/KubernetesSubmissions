@@ -4,10 +4,10 @@ metadata:
   name: pingpong-svc
   namespace: exercises
 spec:
-  type: LoadBalancer        # GKE will allocate external IP
+  type: NodePort
   selector:
     app: pingpong
   ports:
-    - port: 3001
-      targetPort: 3001
+    - port: 80        # service port
+      targetPort: 3001 # container port
 

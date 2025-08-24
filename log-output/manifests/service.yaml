@@ -8,7 +8,6 @@ spec:
   selector:
     app: log-output
   ports:
-    - port: 3000
-      targetPort: 3000
-      nodePort: 31000  # You can now access from browser via localhost:31000
+    - port: 80        # service port (what port-forward / Ingress uses)
+      targetPort: 3000  # pod container port
 

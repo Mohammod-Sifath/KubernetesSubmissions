@@ -1,7 +1,11 @@
+// log-output/index.js
+
 const http = require('http');
 const { v4: uuid } = require('uuid');
 const fs = require('fs');
 const path = require('path');
+const express = require('express');
+const app = express();
 
 // Read environment variable
 const message = process.env.MESSAGE || 'No MESSAGE set';
@@ -22,11 +26,12 @@ console.log(`env variable: MESSAGE=${message}`);
 
 const instanceId = uuid();
 
+// Function to call pingpong service every 5 seconds
 const logMessage = () => {
   const options = {
-    hostname: 'pingpong-svc',  // pingpong Service name
-    port: 3001,                // must match pingpong's service port
-    path: '/ping',
+    hostname: 'pingpong-svc', // Kubernetes Service name
+    port: 80,                 // Service port
+    path: '/pingpong',        // Route exposed by pingpong
     method: 'GET'
   };
 
@@ -53,3 +58,13 @@ const logMessage = () => {
 // Log pingpong call every 5 seconds
 setInterval(logMessage, 5000);
 
+// Expose HTTP server for Ingress / health checks
+app.get('/', (req, res) => {
+  res.send(`Message: ${message}\nFile content: ${fileContent}`);
+});
+
+// Listen on 0.0.0.0 for Kubernetes connectivity
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Log-output app listening on 0.0.0.0:${PORT}`);
+});

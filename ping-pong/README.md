@@ -1,11 +1,15 @@
 
-[![Pingpong GKE](3.1.png)](3.1.png)
+[![Pingpong GKE](3.2.png)](3.2.png)
 
-1. go to both folders and command
+make sure you have `exercises` namespace
+
+1. go to both folders and command(log-output in root and pingpong)
 
 ```kubectl apply -f manifests -n exercises```
 
-2. then Get the external IP of the LoadBalancer service:
-```kubectl get svc -n exercises```
+2. then Get the external IP of the ingress:
+```kubectl get ingress -n exercises```
 
-3. visit:```http://<EXTERNAL-IP>:3001/pingpong```
+3. Log Output: http://<Ingress-EXTERNAL-IP>/
+
+   Ping-Pong: http://<Ingress-EXTERNAL-IP>/pingpong
