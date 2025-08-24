@@ -4,10 +4,10 @@ metadata:
   name: log-output-svc
   namespace: exercises
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: log-output
   ports:
-    - port: 80        # service port (what port-forward / Ingress uses)
-      targetPort: 3000  # pod container port
+    - port: 80
+      targetPort: 3000
 
