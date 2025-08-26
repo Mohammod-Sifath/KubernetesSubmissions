@@ -16,11 +16,19 @@ spec:
     - name: log-output-svc
       namespace: exercises
       port: 80
+
   - matches:
     - path:
         type: PathPrefix
         value: /pingpong
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
     backendRefs:
     - name: pingpong-svc
       namespace: exercises
       port: 80
+

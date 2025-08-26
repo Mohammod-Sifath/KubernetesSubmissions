@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
         - name: pingpong
-          image: dockersifath/pingpong:3.2   # build a new version after fixing index.js
+          image: dockersifath/pingpong:3.4   # build a new version after fixing index.js
           ports:
             - containerPort: 3001
