@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: project
+
+resources:
+  - deployment.yaml
+  - service.yaml
+  - configmap.yaml
+  - postgres-service.yaml
+  - secret.yaml
+  - statefulset.yaml
+
+images:
+  - name: dockersifath/todo-backend
+    newTag: "2.10"
+

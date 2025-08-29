@@ -35,6 +35,8 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: POSTGRES_PASSWORD
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata  # subdirectory to avoid initdb errors
           volumeMounts:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
@@ -46,3 +48,4 @@ spec:
         resources:
           requests:
             storage: 1Gi
+        storageClassName: standard-rwo   # optional, or remove to use default

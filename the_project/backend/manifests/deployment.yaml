@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: todo-backend
-          image: dockersifath/todo-backend:2.10  # new image with DB code
+          image: dockersifath/todo-backend  # new image with DB code
           ports:
             - containerPort: 3002
           env:

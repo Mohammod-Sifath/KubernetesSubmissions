@@ -4,6 +4,6 @@ metadata:
   name: the-project-config
   namespace: project
 data:
-  BACKEND_URL: http://localhost:3002
+  BACKEND_URL: ""   # empty string, fetch calls handle /todos explicitly
   PORT: "3000"
 

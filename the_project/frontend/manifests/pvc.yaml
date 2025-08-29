@@ -4,11 +4,10 @@ metadata:
   name: todo-app-pvc
   namespace: project
 spec:
-  volumeName: todo-pv               # explicit binding to PV named todo-pv
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
-  storageClassName: manual          # <- must match PV's storageClassName
+  storageClassName: standard-rwo   # <- GKE’s default dynamic storage class
 
