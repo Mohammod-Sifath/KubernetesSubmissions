@@ -11,7 +11,7 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /
+        value: /logoutput
     backendRefs:
     - name: log-output-svc
       namespace: exercises
@@ -31,4 +31,3 @@ spec:
     - name: pingpong-svc
       namespace: exercises
       port: 80
-

@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: log-output
-          image: dockersifath/log-output:3.2.2
+          image: dockersifath/log-output:4.1.2  # your updated image
           ports:
             - containerPort: 3000
           env:
@@ -24,10 +24,36 @@ spec:
                 configMapKeyRef:
                   name: log-config
                   key: MESSAGE
+            - name: PGHOST
+              value: postgres-svc
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: pg-secret
+                  key: POSTGRES_USER
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pg-secret
+                  key: POSTGRES_PASSWORD
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: pg-secret
+                  key: POSTGRES_DB
+            - name: PGPORT
+              value: "5432"
           volumeMounts:
             - name: config-volume
-              mountPath: /app/config  # Change to your app's expected path
+              mountPath: /usr/src/app/config
               readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /healthz     # ← points to health endpoint that checks pingpong + DB
+              port: 3000          # ← must match container port
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
       volumes:
         - name: config-volume
           configMap:
@@ -35,4 +61,3 @@ spec:
             items:
               - key: information.txt
                 path: information.txt
-

@@ -15,6 +15,34 @@ spec:
     spec:
       containers:
         - name: pingpong
-          image: dockersifath/pingpong:3.4   # build a new version after fixing index.js
+          image: dockersifath/pingpong:4.1.1
           ports:
             - containerPort: 3001
+          env:
+            # Use the StatefulSet's stable pod DNS through the headless service
+            - name: PGHOST
+              value: "postgres-sts-0.postgres-svc"
+            - name: PGPORT
+              value: "5432"
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: pg-secret
+                  key: POSTGRES_USER
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pg-secret
+                  key: POSTGRES_PASSWORD
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: pg-secret
+                  key: POSTGRES_DB
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3001
+            initialDelaySeconds: 10
+            periodSeconds: 5
+

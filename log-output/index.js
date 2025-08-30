@@ -1,69 +1,81 @@
 // log-output/index.js
 
-const http = require('http');
 const { v4: uuid } = require('uuid');
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
+const { Pool } = require('pg');   // Postgres client
+const http = require('http');
 const app = express();
 
-// Read environment variable
 const message = process.env.MESSAGE || 'No MESSAGE set';
 
-// Read the file content
-const filePath = path.join(__dirname, 'config', 'information.txt'); // match with volumeMount path
+// File reading logic
+const filePath = path.join(__dirname, 'config', 'information.txt');
 let fileContent = 'Could not read file';
-
 try {
   fileContent = fs.readFileSync(filePath, 'utf8');
 } catch (err) {
   fileContent = `Error reading file: ${err.message}`;
 }
 
-// Log file content and environment variable once when app starts
 console.log(`file content: ${fileContent}`);
 console.log(`env variable: MESSAGE=${message}`);
 
 const instanceId = uuid();
 
-// Function to call pingpong service every 5 seconds
-const logMessage = () => {
-  const options = {
-    hostname: 'pingpong-svc', // Kubernetes Service name
-    port: 80,                 // Service port
-    path: '/pingpong',        // Route exposed by pingpong
-    method: 'GET'
-  };
-
-  const req = http.request(options, res => {
-    let data = '';
-
-    res.on('data', chunk => {
-      data += chunk;
-    });
-
-    res.on('end', () => {
-      const timestamp = new Date().toISOString();
-      console.log(`${timestamp}: ${instanceId}. Ping / Pongs: ${data}`);
-    });
-  });
-
-  req.on('error', error => {
-    console.error('Error calling pingpong service:', error);
-  });
-
-  req.end();
-};
-
-// Log pingpong call every 5 seconds
-setInterval(logMessage, 5000);
-
-// Expose HTTP server for Ingress / health checks
-app.get('/', (req, res) => {
-  res.send(`Message: ${message}\nFile content: ${fileContent}`);
+// --- Postgres connection ---
+const pool = new Pool({
+  host: process.env.PGHOST || 'postgres-svc',
+  user: process.env.PGUSER || 'pingpong',
+  password: process.env.PGPASSWORD || 'sp123',
+  database: process.env.PGDATABASE || 'pingpong',
+  port: process.env.PGPORT || 5432
 });
 
-// Listen on 0.0.0.0 for Kubernetes connectivity
+// Every 5s → query the counter directly
+const logMessage = async () => {
+  try {
+    const result = await pool.query('SELECT counter FROM pingpong LIMIT 1');
+    const counter = result.rows[0]?.counter ?? 0;
+    const timestamp = new Date().toISOString();
+    console.log(`${timestamp}: ${instanceId}. Ping / Pongs: ${counter}`);
+  } catch (err) {
+    console.error('Error querying database:', err.message);
+  }
+};
+setInterval(logMessage, 5000);
+
+// Root endpoint
+app.get('/', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT counter FROM pingpong LIMIT 1');
+    const counter = result.rows[0]?.counter ?? 0;
+    res.send(`Message: ${message}\nFile content: ${fileContent}\nPingpong counter: ${counter}`);
+  } catch (err) {
+    res.status(500).send('Error reading counter from database');
+  }
+});
+
+// --- New health endpoint for readiness probe ---
+app.get('/healthz', async (req, res) => {
+  const options = {
+    hostname: 'pingpong-svc',
+    port: 80,
+    path: '/pingpong',
+    method: 'GET'
+  };
+  const request = http.request(options, response => {
+    if (response.statusCode === 200) {
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(500);
+    }
+  });
+  request.on('error', () => res.sendStatus(500));
+  request.end();
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Log-output app listening on 0.0.0.0:${PORT}`);
