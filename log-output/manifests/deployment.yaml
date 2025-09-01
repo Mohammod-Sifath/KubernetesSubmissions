@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: log-output
-          image: dockersifath/log-output:4.1.2  # your updated image
+          image: dockersifath/log-output:4.1.2
           ports:
             - containerPort: 3000
           env:
@@ -49,11 +49,17 @@ spec:
               readOnly: true
           readinessProbe:
             httpGet:
-              path: /healthz     # ← points to health endpoint that checks pingpong + DB
-              port: 3000          # ← must match container port
+              path: /healthz      # your index.js forwards this to pingpong-svc:/pingpong
+              port: 3000          # must be CONTAINER port, not 80
             initialDelaySeconds: 5
             periodSeconds: 5
             failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 10
       volumes:
         - name: config-volume
           configMap:
