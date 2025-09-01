@@ -39,3 +39,4 @@
 
 ### Chapter 5
 - [4.1](https://github.com/Mohammod-Sifath/KubernetesSubmissions/tree/4.1/ping-pong)
+- [4.2](https://github.com/Mohammod-Sifath/KubernetesSubmissions/tree/4.2/ping-pong)
