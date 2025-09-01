@@ -25,8 +25,8 @@ W will chekc the readiness and livenss probe by  giving wrong password credentia
 
 7. Restart both apps so that they reload the new correct secret.yaml:
 
-````kubectl rollout restart deployment log-output-deployment -n exercises
+`kubectl rollout restart deployment log-output-deployment -n exercises`
 
-kubectl rollout restart deployment pingpong-deployment -n exercises```
+`kubectl rollout restart deployment pingpong-deployment -n exercises`
 
-All new 3 pods will be `1/1` running.
+ All new 3 pods will be `1/1` running.
